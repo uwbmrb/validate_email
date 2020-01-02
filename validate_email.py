@@ -122,7 +122,11 @@ def validate_email(email, check_mx=False, verify=False, debug=True, sending_emai
         check_mx |= verify
         if check_mx:
             hostname = email[email.find('@') + 1:]
-            mx_hosts = resolve_mail_servers(hostname)
+            try:
+                mx_hosts = resolve_mail_servers(hostname)
+            except dns.resolver.NoAnswer:
+                logger.warning('Failed to determine mail server for domain.')
+                return False
             if mx_hosts is None:
                 return False
             for mx in mx_hosts:
